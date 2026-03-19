@@ -101,12 +101,12 @@ export default function HomePage() {
           <Link to="/wikis">
             <button className="btn-primary btn-lg">📚 Explorar Wikis</button>
           </Link>
-          {isEditor && (
+          {isAuthenticated && (
             <Link to="/wikis/nova">
               <button className="btn-secondary btn-lg">✏️ Criar Wiki</button>
             </Link>
           )}
-          {!isEditor && (
+          {!isAuthenticated && (
             <Link to="/login">
               <button className="btn-secondary btn-lg">🔑 Entrar para Contribuir</button>
             </Link>
