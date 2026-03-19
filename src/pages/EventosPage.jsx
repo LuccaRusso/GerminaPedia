@@ -8,7 +8,7 @@ import { ptBR } from 'date-fns/locale';
 import './pages.css';
 
 export default function EventosPage() {
-  const { isEditor } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -42,7 +42,7 @@ export default function EventosPage() {
             {tiposDisponiveis.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
-        {isEditor && (
+        {isAuthenticated && (
           <Link to="/eventos/novo">
             <button className="btn-primary">+ Novo Evento</button>
           </Link>

@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import './pages.css';
 
 export default function AlunosPage() {
-  const { isEditor } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [alunos, setAlunos] = useState([]);
   const [salas, setSalas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ export default function AlunosPage() {
             ))}
           </select>
         </div>
-        {isEditor && (
+        {isAuthenticated && (
           <Link to="/alunos/novo">
             <button className="btn-primary">+ Novo Aluno</button>
           </Link>
@@ -82,9 +82,7 @@ export default function AlunosPage() {
               {aluno.bio && <div className="entity-card__desc">{aluno.bio}</div>}
               {aluno.wiki ? (
                 <span className="badge badge-green" style={{ marginTop: 'auto' }}>📚 Tem wiki</span>
-              ) : (
-                isEditor && <span className="badge badge-gray" style={{ marginTop: 'auto' }}>Sem wiki</span>
-              )}
+              ) : null}
             </Link>
           ))}
         </div>

@@ -12,14 +12,15 @@ import HistoriasPage from './pages/HistoriasPage';
 import LoginPage from './pages/LoginPage';
 import SearchPage from './pages/SearchPage';
 import ProfilePage from './pages/ProfilePage';
+import NovoAlunoPage from './pages/NovoAlunoPage';
+import NovoEventoPage from './pages/NovoEventoPage';
+import NovaSalaPage from './pages/NovaSalaPage';
+import NovaHistoriaPage from './pages/NovaHistoriaPage';
 
-// Guard: redireciona para login se não autenticado
-function RequireAuth({ children, requiredRole }) {
-  const { isAuthenticated, isEditor, isAdmin, loading } = useAuth();
+function RequireAuth({ children }) {
+  const { isAuthenticated, loading } = useAuth();
   if (loading) return null;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (requiredRole === 'editor' && !isEditor) return <Navigate to="/" replace />;
-  if (requiredRole === 'admin' && !isAdmin) return <Navigate to="/" replace />;
   return children;
 }
 
@@ -28,6 +29,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
 
+      {/* Páginas públicas */}
       <Route path="/" element={<Layout><HomePage /></Layout>} />
       <Route path="/wikis" element={<Layout><WikisListPage /></Layout>} />
       <Route path="/wiki/:slug" element={<Layout><WikiDetailPage /></Layout>} />
@@ -37,24 +39,14 @@ export default function App() {
       <Route path="/historias" element={<Layout><HistoriasPage /></Layout>} />
       <Route path="/busca" element={<Layout><SearchPage /></Layout>} />
 
-      {/* Perfil — qualquer logado */}
-      <Route path="/perfil" element={
-        <RequireAuth>
-          <Layout><ProfilePage /></Layout>
-        </RequireAuth>
-      } />
-
-      {/* Editor de wiki — qualquer logado */}
-      <Route path="/wikis/nova" element={
-        <RequireAuth>
-          <Layout><WikiEditorPage /></Layout>
-        </RequireAuth>
-      } />
-      <Route path="/wikis/:id/editar" element={
-        <RequireAuth>
-          <Layout><WikiEditorPage /></Layout>
-        </RequireAuth>
-      } />
+      {/* Páginas protegidas — qualquer logado */}
+      <Route path="/perfil" element={<RequireAuth><Layout><ProfilePage /></Layout></RequireAuth>} />
+      <Route path="/wikis/nova" element={<RequireAuth><Layout><WikiEditorPage /></Layout></RequireAuth>} />
+      <Route path="/wikis/:id/editar" element={<RequireAuth><Layout><WikiEditorPage /></Layout></RequireAuth>} />
+      <Route path="/alunos/novo" element={<RequireAuth><Layout><NovoAlunoPage /></Layout></RequireAuth>} />
+      <Route path="/eventos/novo" element={<RequireAuth><Layout><NovoEventoPage /></Layout></RequireAuth>} />
+      <Route path="/salas/nova" element={<RequireAuth><Layout><NovaSalaPage /></Layout></RequireAuth>} />
+      <Route path="/historias/nova" element={<RequireAuth><Layout><NovaHistoriaPage /></Layout></RequireAuth>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

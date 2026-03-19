@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import './pages.css';
 
 export default function SalasPage() {
-  const { isEditor } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [salas, setSalas] = useState([]);
   const [anos, setAnos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ export default function SalasPage() {
             {anos.map((ano) => <option key={ano} value={ano}>{ano}</option>)}
           </select>
         </div>
-        {isEditor && (
+        {isAuthenticated && (
           <Link to="/salas/nova">
             <button className="btn-primary">+ Nova Sala</button>
           </Link>

@@ -52,6 +52,7 @@ export const authApi = {
 export const wikisApi = {
   list: (params) => api.get('/wikis', { params }).then((r) => r.data),
   getBySlug: (slug) => api.get(`/wikis/${slug}`).then((r) => r.data),
+  getById: (id) => api.get(`/wikis/id/${id}`).then((r) => r.data),
   create: (data) => api.post('/wikis', data).then((r) => r.data),
   update: (id, data) => api.put(`/wikis/${id}`, data).then((r) => r.data),
   delete: (id) => api.delete(`/wikis/${id}`),

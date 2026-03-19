@@ -6,14 +6,13 @@ import './pages.css';
 import './LoginPage.css';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +26,8 @@ export default function LoginPage() {
       }
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message ?? 'Erro de autenticação. Verifique seus dados.');
+      const msg = err.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Erro de autenticação. Verifique seus dados.'));
     } finally {
       setLoading(false);
     }
@@ -60,6 +60,8 @@ export default function LoginPage() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
+                minLength={2}
+                className="login-input"
               />
             </div>
           )}
@@ -68,71 +70,83 @@ export default function LoginPage() {
             <label className="login-label">Email</label>
             <input
               type="email"
-              placeholder="voce@escola.com"
+              placeholder="seu@email.com"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
+              className="login-input"
             />
           </div>
 
           <div>
             <label className="login-label">Senha</label>
-            <input
-              type="password"
-              placeholder={mode === 'register' ? 'Mínimo 6 caracteres' : '••••••'}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              minLength={6}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder={mode === 'register' ? 'Mínimo 6 caracteres' : '••••••'}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+                minLength={6}
+                className="login-input"
+                style={{ paddingRight: '44px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute', right: '12px', top: '50%',
+                  transform: 'translateY(-50%)', background: 'none',
+                  border: 'none', cursor: 'pointer', fontSize: '18px',
+                  color: 'var(--text-muted)', padding: '0',
+                }}
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
-          <button type="submit" className="btn-primary btn-lg" disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
-            {loading ? (
-              <><span className="spinner" style={{ width: '16px', height: '16px' }} /> Aguarde...</>
-            ) : (
-              mode === 'login' ? '🔑 Entrar' : '🚀 Criar conta'
-            )}
+          <button type="submit" className="btn-primary login-btn" disabled={loading}>
+            {loading ? '⏳ Aguarde...' : mode === 'login' ? '🔑 Entrar' : '✅ Criar conta'}
           </button>
         </form>
 
         <div className="login-switch">
           {mode === 'login' ? (
-            <>Não tem conta?{' '}
-              <button className="btn-ghost" onClick={() => { setMode('register'); setError(''); }}>
-                Registrar-se
+            <>
+              Não tem conta?{' '}
+              <button className="btn-link" onClick={() => { setMode('register'); setError(''); }}>
+                Criar conta gratuita
               </button>
             </>
           ) : (
-            <>Já tem conta?{' '}
-              <button className="btn-ghost" onClick={() => { setMode('login'); setError(''); }}>
+            <>
+              Já tem conta?{' '}
+              <button className="btn-link" onClick={() => { setMode('login'); setError(''); }}>
                 Fazer login
               </button>
             </>
           )}
         </div>
 
-        {mode === 'login' && (
-          <div className="login-demo">
-            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: '8px' }}>
-              Credenciais de demonstração:
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              {[
-                { role: 'Admin', email: 'admin@germinapedia.com', pwd: 'Admin@123' },
-                { role: 'Editor', email: 'editor@germinapedia.com', pwd: 'Editor@123' },
-                { role: 'Leitor', email: 'leitor@germinapedia.com', pwd: 'Reader@123' },
-              ].map((d) => (
-                <button key={d.email} className="btn-ghost btn-sm"
-                  onClick={() => setForm({ email: d.email, password: d.pwd, name: '' })}
-                  style={{ fontSize: 'var(--text-xs)', textAlign: 'left' }}
-                >
-                  [{d.role}] {d.email}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Acesso rápido para testes */}
+        <div style={{ marginTop: '16px', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '8px', fontSize: 'var(--text-sm)' }}>
+          <div style={{ color: 'var(--text-muted)', marginBottom: '8px', fontWeight: 600 }}>Acesso rápido:</div>
+          {[
+            { role: 'ADMIN', email: 'admin@germinapedia.com', pwd: 'GerminaPedia@2024' },
+            { role: 'EDITOR', email: 'editor@germinapedia.com', pwd: 'Editor@123' },
+          ].map((d) => (
+            <button
+              key={d.email}
+              className="btn-ghost"
+              onClick={() => setForm({ email: d.email, password: d.pwd, name: '' })}
+              style={{ fontSize: 'var(--text-xs)', textAlign: 'left', display: 'block', width: '100%' }}
+            >
+              [{d.role}] {d.email}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

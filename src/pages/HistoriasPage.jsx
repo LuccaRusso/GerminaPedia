@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import './pages.css';
 
 export default function HistoriasPage() {
-  const { isEditor } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [historias, setHistorias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -43,7 +43,7 @@ export default function HistoriasPage() {
             <option value="false">Sem destaque</option>
           </select>
         </div>
-        {isEditor && (
+        {isAuthenticated && (
           <Link to="/historias/nova">
             <button className="btn-primary">+ Nova História</button>
           </Link>

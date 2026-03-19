@@ -69,8 +69,7 @@ export default function WikiEditorPage() {
     if (isEditing) {
       setLoading(true);
       wikisApi
-        .getBySlug(id) // tenta pelo slug
-        .catch(() => wikisApi.findById?.(id))
+        .getById(id)
         .then((wiki) => {
           setForm({
             slug: wiki.slug,
