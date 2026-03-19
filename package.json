@@ -1,7 +1,7 @@
 {
   "name": "germinapedia",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,14 @@
   "dependencies": {
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.3"
+    "react-router-dom": "^7.6.3",
+    "@uiw/react-md-editor": "^4.0.4",
+    "react-markdown": "^9.0.1",
+    "remark-gfm": "^4.0.0",
+    "socket.io-client": "^4.6.1",
+    "axios": "^1.6.5",
+    "date-fns": "^3.3.1",
+    "lucide-react": "^0.525.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
@@ -23,17 +30,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
-    "husky": "^9.1.7",
-    "lint-staged": {
-      "src/**/*.{js,jsx,ts,tsx}": [
-        "eslint --fix",
-        "prettier --write"
-      ]
-    },
     "prettier": "^3.6.2",
-    "vite": "^7.0.0",
-    "scripts": {
-      "release": "standard-version"
-    }
+    "vite": "^7.0.0"
   }
 }
