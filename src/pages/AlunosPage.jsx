@@ -1,8 +1,9 @@
 // src/pages/AlunosPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { alunosApi, salasApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getSocket } from '../services/socket';
 import './pages.css';
 
 export default function AlunosPage() {
@@ -15,7 +16,7 @@ export default function AlunosPage() {
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await alunosApi.list({ search: search || undefined, salaId: salaFilter || undefined, page, limit: 24 });
@@ -24,10 +25,21 @@ export default function AlunosPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, salaFilter, page]);
 
   useEffect(() => { salasApi.list({ limit: 100 }).then((r) => setSalas(r.data)); }, []);
-  useEffect(() => { load(); }, [search, salaFilter, page]);
+  useEffect(() => { load(); }, [load]);
+
+  // Real-time: atualiza quando aluno/wiki for criado ou alterado
+  useEffect(() => {
+    const socket = getSocket();
+    socket.on('wiki:created', load);
+    socket.on('wiki:updated', load);
+    return () => {
+      socket.off('wiki:created', load);
+      socket.off('wiki:updated', load);
+    };
+  }, [load]);
 
   return (
     <div>

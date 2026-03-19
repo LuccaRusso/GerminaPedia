@@ -155,7 +155,7 @@ export default function WikiDetailPage() {
 
         {/* Ações */}
         <div className="wiki-detail__actions">
-          {isEditor && (
+          {(isEditor || wiki.criadoPor?.id === user?.id) && (
             <Link to={`/wikis/${wiki.id}/editar`}>
               <button className="btn-primary">✏️ Editar</button>
             </Link>
@@ -163,7 +163,7 @@ export default function WikiDetailPage() {
           <button className="btn-secondary" onClick={showVersions ? () => setShowVersions(false) : loadVersions}>
             🕑 {showVersions ? 'Ocultar Histórico' : 'Ver Histórico'}
           </button>
-          {isAdmin && (
+          {(isAdmin || wiki.criadoPor?.id === user?.id) && (
             <button className="btn-danger btn-sm" onClick={handleDelete}>
               🗑️ Deletar
             </button>
@@ -186,7 +186,7 @@ export default function WikiDetailPage() {
                     {v.comentario && ` · "${v.comentario}"`}
                   </div>
                 </div>
-                {isEditor && (
+                {(isEditor || wiki.criadoPor?.id === user?.id) && (
                   <button
                     className="btn-secondary btn-sm"
                     onClick={() => {

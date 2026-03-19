@@ -1,8 +1,9 @@
 // src/pages/EventosPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { eventosApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getSocket } from '../services/socket';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import './pages.css';
@@ -16,12 +17,25 @@ export default function EventosPage() {
   const [meta, setMeta] = useState({ total: 0, totalPages: 1 });
   const [page, setPage] = useState(1);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     setLoading(true);
     eventosApi.list({ search: search || undefined, tipo: tipo || undefined, page, limit: 24 })
       .then((r) => { setEventos(r.data); setMeta(r.meta); })
       .finally(() => setLoading(false));
   }, [search, tipo, page]);
+
+  useEffect(() => { load(); }, [load]);
+
+  // Real-time: atualiza quando wiki de evento for criada/alterada
+  useEffect(() => {
+    const socket = getSocket();
+    socket.on('wiki:created', load);
+    socket.on('wiki:updated', load);
+    return () => {
+      socket.off('wiki:created', load);
+      socket.off('wiki:updated', load);
+    };
+  }, [load]);
 
   const tiposDisponiveis = ['Formatura', 'Excursão', 'Festa', 'Reunião', 'Esporte', 'Cultura', 'Outro'];
 
