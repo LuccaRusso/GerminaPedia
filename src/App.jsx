@@ -1,7 +1,3 @@
-// src/App.jsx
-// Roteamento principal da aplicação
-// Estrutura: Layout wrappeia todas as páginas exceto Login
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Layout from './components/layout/Layout';
@@ -15,6 +11,7 @@ import EventosPage from './pages/EventosPage';
 import HistoriasPage from './pages/HistoriasPage';
 import LoginPage from './pages/LoginPage';
 import SearchPage from './pages/SearchPage';
+import ProfilePage from './pages/ProfilePage';
 
 // Guard: redireciona para login se não autenticado
 function RequireAuth({ children, requiredRole }) {
@@ -29,10 +26,8 @@ function RequireAuth({ children, requiredRole }) {
 export default function App() {
   return (
     <Routes>
-      {/* Login — sem layout principal */}
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Todas as outras rotas usam o Layout */}
       <Route path="/" element={<Layout><HomePage /></Layout>} />
       <Route path="/wikis" element={<Layout><WikisListPage /></Layout>} />
       <Route path="/wiki/:slug" element={<Layout><WikiDetailPage /></Layout>} />
@@ -42,19 +37,25 @@ export default function App() {
       <Route path="/historias" element={<Layout><HistoriasPage /></Layout>} />
       <Route path="/busca" element={<Layout><SearchPage /></Layout>} />
 
-      {/* Rotas protegidas (editor+) */}
+      {/* Perfil — qualquer logado */}
+      <Route path="/perfil" element={
+        <RequireAuth>
+          <Layout><ProfilePage /></Layout>
+        </RequireAuth>
+      } />
+
+      {/* Editor de wiki — qualquer logado */}
       <Route path="/wikis/nova" element={
-        <RequireAuth requiredRole="editor">
+        <RequireAuth>
           <Layout><WikiEditorPage /></Layout>
         </RequireAuth>
       } />
       <Route path="/wikis/:id/editar" element={
-        <RequireAuth requiredRole="editor">
+        <RequireAuth>
           <Layout><WikiEditorPage /></Layout>
         </RequireAuth>
       } />
 
-      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

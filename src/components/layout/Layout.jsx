@@ -53,7 +53,7 @@ export default function Layout({ children }) {
         </div>
 
         <nav className="header__nav">
-          {isEditor && (
+          {isAuthenticated && (
             <Link to="/wikis/nova">
               <button className="btn-primary btn-sm">
                 + Nova Wiki
@@ -106,38 +106,17 @@ export default function Layout({ children }) {
           ))}
         </div>
 
-        {isEditor && (
+        {isAuthenticated && (
           <div className="sidebar__section">
             <div className="sidebar__label">Criar</div>
-            <NavLink
-              to="/wikis/nova"
-              className={({ isActive }) =>
-                `sidebar__link ${isActive ? 'active' : ''}`
-              }
-              onClick={closeSidebar}
-            >
-              <span className="sidebar__link-icon">✏️</span>
-              Nova Wiki
+            <NavLink to="/wikis/nova" className={({ isActive }) => `sidebar__link ${isActive ? 'active' : ''}`} onClick={closeSidebar}>
+              <span className="sidebar__link-icon">✏️</span>Nova Wiki
             </NavLink>
-            <NavLink
-              to="/alunos/novo"
-              className={({ isActive }) =>
-                `sidebar__link ${isActive ? 'active' : ''}`
-              }
-              onClick={closeSidebar}
-            >
-              <span className="sidebar__link-icon">👤</span>
-              Novo Aluno
+            <NavLink to="/alunos/novo" className={({ isActive }) => `sidebar__link ${isActive ? 'active' : ''}`} onClick={closeSidebar}>
+              <span className="sidebar__link-icon">👤</span>Novo Aluno
             </NavLink>
-            <NavLink
-              to="/eventos/novo"
-              className={({ isActive }) =>
-                `sidebar__link ${isActive ? 'active' : ''}`
-              }
-              onClick={closeSidebar}
-            >
-              <span className="sidebar__link-icon">🎉</span>
-              Novo Evento
+            <NavLink to="/eventos/novo" className={({ isActive }) => `sidebar__link ${isActive ? 'active' : ''}`} onClick={closeSidebar}>
+              <span className="sidebar__link-icon">🎉</span>Novo Evento
             </NavLink>
           </div>
         )}

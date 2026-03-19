@@ -101,3 +101,9 @@ export const historiasApi = {
 export const searchApi = {
   search: (q, limit = 10) => api.get('/search', { params: { q, limit } }).then((r) => r.data),
 };
+
+// ─── Users ────────────────────────────────────────────────────
+export const usersApi = {
+  me: () => api.get('/users/me').then((r) => r.data),
+  updateProfile: (data) => api.put('/users/me/profile', data).then((r) => r.data),
+};

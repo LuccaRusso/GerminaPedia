@@ -44,7 +44,7 @@ function EntityCard({ item, tipo }) {
 }
 
 export default function HomePage() {
-  const { isEditor } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [recentWikis, setRecentWikis] = useState([]);
   const [stats, setStats] = useState({ wikis: 0, alunos: 0, salas: 0, eventos: 0 });
   const [loading, setLoading] = useState(true);
