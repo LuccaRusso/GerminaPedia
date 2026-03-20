@@ -36,6 +36,14 @@ export default function WikiEditorPage() {
     eventoId: '',
     historiaId: '',
     comentarioVersao: '',
+    // campos extras para auto-criação da entidade
+    extraAno: new Date().getFullYear(),
+    extraTurno: '',
+    extraMatricula: '',
+    extraDataInicio: new Date().toISOString().split('T')[0],
+    extraTipoEvento: '',
+    extraLocal: '',
+    extraDestaque: false,
   });
 
   const [salas, setSalas] = useState([]);
@@ -126,10 +134,18 @@ export default function WikiEditorPage() {
       const payload = {
         ...form,
         tags: form.tags ? form.tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean) : [],
-        salaId: form.salaId || undefined,
-        alunoId: form.alunoId || undefined,
-        eventoId: form.eventoId || undefined,
+        salaId:     form.salaId     || undefined,
+        alunoId:    form.alunoId    || undefined,
+        eventoId:   form.eventoId   || undefined,
         historiaId: form.historiaId || undefined,
+        // extras — só envia se relevante pro tipo e sem FK manual
+        extraAno:         (!form.salaId && form.tipo === 'SALA')     ? Number(form.extraAno)    : undefined,
+        extraTurno:       (!form.salaId && form.tipo === 'SALA')     ? form.extraTurno || undefined : undefined,
+        extraMatricula:   (!form.alunoId && form.tipo === 'ALUNO')   ? form.extraMatricula || undefined : undefined,
+        extraDataInicio:  (!form.eventoId && form.tipo === 'EVENTO') ? form.extraDataInicio || undefined : undefined,
+        extraTipoEvento:  (!form.eventoId && form.tipo === 'EVENTO') ? form.extraTipoEvento || undefined : undefined,
+        extraLocal:       (!form.eventoId && form.tipo === 'EVENTO') ? form.extraLocal || undefined : undefined,
+        extraDestaque:    (!form.historiaId && form.tipo === 'HISTORIA') ? form.extraDestaque : undefined,
       };
 
       let result;
@@ -305,7 +321,7 @@ export default function WikiEditorPage() {
 
             {(form.tipo === 'SALA' || form.tipo === 'GERAL') && (
               <div className="wiki-editor__field">
-                <label className="wiki-editor__label">Sala</label>
+                <label className="wiki-editor__label">Sala existente</label>
                 <select value={form.salaId} onChange={(e) => handleChange('salaId', e.target.value)}>
                   <option value="">— Nenhuma —</option>
                   {salas.map((s) => (
@@ -317,7 +333,7 @@ export default function WikiEditorPage() {
 
             {(form.tipo === 'ALUNO' || form.tipo === 'GERAL') && (
               <div className="wiki-editor__field">
-                <label className="wiki-editor__label">Aluno</label>
+                <label className="wiki-editor__label">Aluno existente</label>
                 <select value={form.alunoId} onChange={(e) => handleChange('alunoId', e.target.value)}>
                   <option value="">— Nenhum —</option>
                   {alunos.map((a) => (
@@ -329,7 +345,7 @@ export default function WikiEditorPage() {
 
             {(form.tipo === 'EVENTO' || form.tipo === 'GERAL') && (
               <div className="wiki-editor__field">
-                <label className="wiki-editor__label">Evento</label>
+                <label className="wiki-editor__label">Evento existente</label>
                 <select value={form.eventoId} onChange={(e) => handleChange('eventoId', e.target.value)}>
                   <option value="">— Nenhum —</option>
                   {eventos.map((e) => (
@@ -341,7 +357,7 @@ export default function WikiEditorPage() {
 
             {(form.tipo === 'HISTORIA' || form.tipo === 'GERAL') && (
               <div className="wiki-editor__field">
-                <label className="wiki-editor__label">História</label>
+                <label className="wiki-editor__label">História existente</label>
                 <select value={form.historiaId} onChange={(e) => handleChange('historiaId', e.target.value)}>
                   <option value="">— Nenhuma —</option>
                   {historias.map((h) => (
@@ -351,6 +367,111 @@ export default function WikiEditorPage() {
               </div>
             )}
           </div>
+
+          {/* Campos extras — só aparece em criação e quando sem FK manual */}
+          {!isEditing && form.tipo !== 'GERAL' && (
+            <div className="card" style={{ marginTop: '16px', borderColor: 'var(--green-200)', background: 'var(--green-50)' }}>
+              <h4 style={{ marginBottom: '4px' }}>✨ Detalhes da entidade</h4>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', marginBottom: '12px' }}>
+                {form.tipo === 'SALA'     && !form.salaId     && 'Uma nova Sala será criada automaticamente.'}
+                {form.tipo === 'ALUNO'    && !form.alunoId    && 'Um novo Aluno será criado automaticamente.'}
+                {form.tipo === 'EVENTO'   && !form.eventoId   && 'Um novo Evento será criado automaticamente.'}
+                {form.tipo === 'HISTORIA' && !form.historiaId && 'Uma nova História será criada automaticamente.'}
+                {((form.tipo === 'SALA' && form.salaId) || (form.tipo === 'ALUNO' && form.alunoId) ||
+                  (form.tipo === 'EVENTO' && form.eventoId) || (form.tipo === 'HISTORIA' && form.historiaId)) &&
+                  '✅ Usando entidade existente selecionada acima.'}
+              </p>
+
+              {/* SALA */}
+              {form.tipo === 'SALA' && !form.salaId && (
+                <>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Ano da turma *</label>
+                    <input type="number" min="2000" max="2100"
+                      value={form.extraAno}
+                      onChange={(e) => handleChange('extraAno', e.target.value)}
+                      required />
+                  </div>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Turno</label>
+                    <select value={form.extraTurno} onChange={(e) => handleChange('extraTurno', e.target.value)}>
+                      <option value="">— Selecionar —</option>
+                      <option>Manhã</option>
+                      <option>Tarde</option>
+                      <option>Noite</option>
+                      <option>Integral</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* ALUNO */}
+              {form.tipo === 'ALUNO' && !form.alunoId && (
+                <>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Turma do aluno *</label>
+                    <select value={form.salaId} onChange={(e) => handleChange('salaId', e.target.value)} required>
+                      <option value="">— Selecionar turma —</option>
+                      {salas.map((s) => (
+                        <option key={s.id} value={s.id}>{s.nome} ({s.ano})</option>
+                      ))}
+                    </select>
+                    {!form.salaId && (
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--red-500)' }}>
+                        ⚠️ Sem turma selecionada, uma turma genérica será criada automaticamente.
+                      </span>
+                    )}
+                  </div>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Matrícula</label>
+                    <input type="text" placeholder="Ex: 2025001"
+                      value={form.extraMatricula}
+                      onChange={(e) => handleChange('extraMatricula', e.target.value)} />
+                  </div>
+                </>
+              )}
+
+              {/* EVENTO */}
+              {form.tipo === 'EVENTO' && !form.eventoId && (
+                <>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Data do evento *</label>
+                    <input type="date"
+                      value={form.extraDataInicio}
+                      onChange={(e) => handleChange('extraDataInicio', e.target.value)}
+                      required />
+                  </div>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Tipo de evento</label>
+                    <select value={form.extraTipoEvento} onChange={(e) => handleChange('extraTipoEvento', e.target.value)}>
+                      <option value="">— Selecionar —</option>
+                      {['Formatura','Excursão','Festa','Reunião','Esporte','Cultura','Outro'].map(t => (
+                        <option key={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="wiki-editor__field">
+                    <label className="wiki-editor__label">Local</label>
+                    <input type="text" placeholder="Ex: Auditório Principal"
+                      value={form.extraLocal}
+                      onChange={(e) => handleChange('extraLocal', e.target.value)} />
+                  </div>
+                </>
+              )}
+
+              {/* HISTORIA */}
+              {form.tipo === 'HISTORIA' && !form.historiaId && (
+                <div className="wiki-editor__field">
+                  <label className="wiki-editor__label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input type="checkbox"
+                      checked={form.extraDestaque}
+                      onChange={(e) => handleChange('extraDestaque', e.target.checked)} />
+                    ⭐ Destacar na página inicial
+                  </label>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Botões */}
           <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
